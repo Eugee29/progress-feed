@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { createJob } from "../action";
-import { useJobs } from "../context/jobs-provider";
+import { useJobs } from "../contexts/jobs-provider";
 import { Button } from "@/components/ui/button";
 import { PlusIcon, Loader2 } from "lucide-react";
 

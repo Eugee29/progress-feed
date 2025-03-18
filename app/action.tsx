@@ -29,14 +29,14 @@ const updateJob = async (userId: string, jobId: string) => {
 
   await redis.json.set(`${userId}:${jobId}`, "$.status", "processing");
 
-  await sleep(Math.floor(Math.random() * 1000));
+  await sleep(3000);
 
   while (progress <= 100) {
     await redis.json.set(`${userId}:${jobId}`, "$.progress", progress);
     const job = (await redis.json.get(`${userId}:${jobId}`)) as Job;
     await redis.publish(`${userId}:${jobId}`, JSON.stringify(job));
     progress += 1;
-    await sleep(Math.floor(Math.random() * 1000));
+    await sleep(Math.floor(Math.random() * 2000) + 1000); // 1-3 seconds
   }
 
   await redis.json.set(`${userId}:${jobId}`, "$.status", "completed");

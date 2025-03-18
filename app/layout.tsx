@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { JobsProvider } from "./context/jobs-provider";
+import { JobsProvider } from "./contexts/jobs-provider";
 import { Job } from "@/lib/definitions";
 import { redis } from "@/lib/redis";
 
