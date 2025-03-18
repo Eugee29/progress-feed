@@ -4,17 +4,17 @@ import { createClient } from "redis";
 let subscriber: ReturnType<typeof createClient>;
 
 export async function GET() {
+  subscriber = redis.duplicate();
+  if (!subscriber.isOpen) await subscriber.connect();
+
   const stream = new ReadableStream({
     start: async (controller) => {
-      subscriber = redis.duplicate();
-      if (!subscriber.isOpen) await subscriber.connect();
       await subscriber.pSubscribe("user1:*", (message) => {
         controller.enqueue(encodeSSE(message));
       });
     },
 
     cancel: () => {
-      console.log("Cancel");
       subscriber.disconnect();
     },
   });
