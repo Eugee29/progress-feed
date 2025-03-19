@@ -1,7 +1,8 @@
 "use server";
 
 import { Job } from "@/lib/definitions";
-import { redis } from "@/lib/redis";
+import prisma from "@/lib/prisma";
+import redis from "@/lib/redis";
 import { sleep } from "@/lib/utils";
 import { v4 as uuid } from "uuid";
 
@@ -10,10 +11,10 @@ export async function createJob() {
     id: uuid(),
     userId: "user1",
     progress: 0,
-    aspectRatio: (["1/1", "3/2", "2/3"] as const)[
+    aspectRatio: (["SQUARE", "LANDSCAPE", "PORTRAIT"] as const)[
       Math.floor(Math.random() * 3)
     ],
-    status: "pending",
+    status: "PENDING",
     createdAt: Date.now(),
   };
 
@@ -25,21 +26,40 @@ export async function createJob() {
 }
 
 const updateJob = async (userId: string, jobId: string) => {
-  await redis.json.set(`${userId}:${jobId}`, "$.status", "processing");
+  await redis.json.set(`${userId}:${jobId}`, "$.status", "PROCESSING");
 
   await sleep(3000);
 
   let progress = 0;
 
   while (progress < 100) {
+    // progress += Math.floor(Math.random() * 5); // 0-5;
+    progress += 10;
     if (progress > 100) progress = 100;
     await redis.json.set(`${userId}:${jobId}`, "$.progress", progress);
     const job = (await redis.json.get(`${userId}:${jobId}`)) as Job;
     await redis.publish(`${userId}:${jobId}`, JSON.stringify(job));
-    progress += Math.floor(Math.random() * 5); // 0-5;
     await sleep(1000);
+    if (Math.random() < 0.05) break;
   }
 
-  await redis.json.set(`${userId}:${jobId}`, "$.status", "completed");
+  if (progress < 100) {
+    await redis.json.set(`${userId}:${jobId}`, "$.status", "FAILED");
+  } else {
+    await redis.json.set(`${userId}:${jobId}`, "$.status", "COMPLETED");
+  }
+
+  const job = (await redis.json.get(`${userId}:${jobId}`)) as Job;
+  await redis.publish(`${userId}:${jobId}`, JSON.stringify(job));
+
+  await prisma.job.create({
+    data: {
+      userId,
+      status: job.progress < 100 ? "FAILED" : "COMPLETED",
+      aspectRatio: job.aspectRatio,
+      createdAt: new Date(job.createdAt),
+    },
+  });
+
   await redis.json.del(`${userId}:${jobId}`);
 };

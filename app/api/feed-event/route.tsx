@@ -1,4 +1,4 @@
-import { redis } from "@/lib/redis";
+import redis from "@/lib/redis";
 import { createClient } from "redis";
 
 let subscriber: ReturnType<typeof createClient>;

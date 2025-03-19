@@ -12,4 +12,4 @@ redis.on("error", (err) => console.error("Redis Client Error", err));
 
 if (!redis.isOpen) redis.connect();
 
-export { redis };
+export default redis;

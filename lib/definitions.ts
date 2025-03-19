@@ -2,7 +2,7 @@ export type Job = {
   id: string;
   userId: string;
   progress: number;
-  aspectRatio: "1/1" | "3/2" | "2/3";
+  aspectRatio: "SQUARE" | "LANDSCAPE" | "PORTRAIT";
   createdAt: number;
-  status: "pending" | "processing" | "completed" | "failed";
+  status: "PENDING" | "PROCESSING" | "COMPLETED" | "FAILED";
 };

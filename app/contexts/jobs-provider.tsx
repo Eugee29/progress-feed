@@ -31,18 +31,18 @@ export function JobsProvider({
 
     eventSource.onmessage = (event) => {
       const job = JSON.parse(event.data) as Job;
-      if (job.progress === 100) {
-        setJobs((prev) => prev.filter((j) => job.id !== j.id));
-      } else {
-        setJobs((prev) => {
-          const existingJob = prev.find((j) => j.id === job.id);
-          if (existingJob) {
-            return prev.map((j) => (j.id === job.id ? job : j));
-          } else {
-            return [job, ...prev];
-          }
-        });
-      }
+      // if (job.progress === 100) {
+      // setJobs((prev) => prev.filter((j) => job.id !== j.id));
+      // } else {
+      setJobs((prev) => {
+        const existingJob = prev.find((j) => j.id === job.id);
+        if (existingJob) {
+          return prev.map((j) => (j.id === job.id ? job : j));
+        } else {
+          return [job, ...prev];
+        }
+      });
+      // }
     };
 
     return () => {
