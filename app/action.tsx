@@ -33,14 +33,13 @@ const updateJob = async (userId: string, jobId: string) => {
   let progress = 0;
 
   while (progress < 100) {
-    // progress += Math.floor(Math.random() * 5); // 0-5;
-    progress += 10;
+    progress += 5;
     if (progress > 100) progress = 100;
     await redis.json.set(`${userId}:${jobId}`, "$.progress", progress);
     const job = (await redis.json.get(`${userId}:${jobId}`)) as Job;
     await redis.publish(`${userId}:${jobId}`, JSON.stringify(job));
     await sleep(1000);
-    if (Math.random() < 0.05) break;
+    if (Math.random() < 0.01) break;
   }
 
   if (progress < 100) {
