@@ -1,5 +1,5 @@
 import { Progress } from "@/components/ui/progress";
-import { Job } from "@/lib/definitions";
+import { Job } from "@prisma/client";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
 
 export default function Card({ job }: { job: Job }) {

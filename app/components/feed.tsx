@@ -1,9 +1,9 @@
 "use client";
 
-import { Job } from "@/lib/definitions";
 import { useJobs } from "../contexts/jobs-provider";
 import { useMemo } from "react";
 import Card from "./card";
+import { Job } from "@prisma/client";
 
 export default function Feed() {
   const { jobs } = useJobs();

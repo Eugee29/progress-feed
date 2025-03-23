@@ -1,6 +1,6 @@
 "use client";
 
-import { Job } from "@/lib/definitions";
+import { Job } from "@prisma/client";
 import {
   createContext,
   Dispatch,
