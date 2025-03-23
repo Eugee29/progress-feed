@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { JobsProvider } from "./contexts/jobs-provider";
-import { Job } from "@/lib/definitions";
-import redis from "@/lib/redis";
 import prisma from "@/lib/prisma";
 
 const geistSans = Geist({
@@ -28,7 +26,14 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const jobs = await getJobs();
+  const jobs = await prisma.job.findMany({
+    where: {
+      userId: "user1",
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 
   return (
     <html lang="en">
@@ -40,31 +45,3 @@ export default async function RootLayout({
     </html>
   );
 }
-
-const getJobs = async () => {
-  const keys = await redis.keys("user1:*");
-  const jobs: Job[] = [];
-  const prismaJobs = await prisma.job.findMany({
-    where: {
-      userId: "user1",
-    },
-  });
-
-  for (const job of prismaJobs) {
-    jobs.push({
-      id: job.id,
-      userId: job.userId,
-      status: job.status,
-      aspectRatio: job.aspectRatio,
-      createdAt: job.createdAt.getTime(),
-      progress: 100,
-    });
-  }
-
-  for (const key of keys) {
-    const job = (await redis.json.get(key)) as Job;
-    jobs.push(job);
-  }
-
-  return jobs.sort((a, b) => b.createdAt - a.createdAt);
-};

@@ -1,21 +1,25 @@
-import redis from "@/lib/redis";
-import { createClient } from "redis";
-
-let subscriber: ReturnType<typeof createClient>;
+import prisma from "@/lib/prisma";
 
 export async function GET() {
-  subscriber = redis.duplicate();
-  if (!subscriber.isOpen) await subscriber.connect();
+  let interval: NodeJS.Timeout;
 
   const stream = new ReadableStream({
     start: async (controller) => {
-      await subscriber.pSubscribe("user1:*", (message) => {
-        controller.enqueue(encodeSSE(message));
-      });
+      interval = setInterval(async () => {
+        const jobs = await prisma.job.findMany({
+          where: {
+            userId: "user1",
+          },
+        });
+
+        for (const job of jobs) {
+          controller.enqueue(encodeSSE(JSON.stringify(job)));
+        }
+      }, 1000);
     },
 
     cancel: () => {
-      subscriber.disconnect();
+      clearInterval(interval);
     },
   });
 
