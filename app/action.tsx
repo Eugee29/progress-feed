@@ -29,7 +29,7 @@ const updateJob = async (jobId: string) => {
   let progress = 0;
 
   while (progress < 100) {
-    progress += Math.floor(Math.random() * 4 + 1);
+    progress += Math.floor(Math.random() * 9 + 1);
     if (progress > 100) progress = 100;
 
     await prisma.job.update({
@@ -37,7 +37,7 @@ const updateJob = async (jobId: string) => {
       data: { progress },
     });
 
-    await sleep(Math.floor(Math.random() * 4000 + 1000));
+    await sleep(Math.floor(Math.random() * 2000 + 500));
 
     if (Math.random() < 0.01) break;
   }

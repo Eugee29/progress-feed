@@ -5,15 +5,23 @@ export async function GET() {
 
   const stream = new ReadableStream({
     start: async (controller) => {
+      let lastUpdateTime = new Date();
+
       interval = setInterval(async () => {
         const jobs = await prisma.job.findMany({
           where: {
             userId: "user1",
+            updatedAt: {
+              gt: lastUpdateTime,
+            },
           },
         });
 
-        for (const job of jobs) {
-          controller.enqueue(encodeSSE(JSON.stringify(job)));
+        if (jobs.length > 0) {
+          lastUpdateTime = new Date();
+          for (const job of jobs) {
+            controller.enqueue(encodeSSE(JSON.stringify(job)));
+          }
         }
       }, 1000);
     },
